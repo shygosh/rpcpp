@@ -3,7 +3,7 @@
 /**
  * @brief Get X window property simplified.
  * Should be freed after usage.
- * 
+ *
  * @param disp Current display
  * @param win Current window
  * @param xa_prop_type Prop type, equal to the return prop type Atom, otherwise NULL will be returned
@@ -11,7 +11,7 @@
  * @return 1 on success, 0 on error
  */
 static int get_property(Display *disp, Window win,
-                          Atom xa_prop_type, string prop_name, char *ret, size_t ret_length)
+                        Atom xa_prop_type, string prop_name, char *ret, size_t ret_length)
 {
     Atom xa_prop_name;
     Atom xa_ret_type;
@@ -54,12 +54,12 @@ string wm_info(Display *disp)
     char wm_name[256];
 
     if (!get_property(disp, DefaultRootWindow(disp),
-                                              XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
-                                              (char *)sup_window, sizeof(sup_window)))
+                      XA_WINDOW, "_NET_SUPPORTING_WM_CHECK",
+                      (char *)sup_window, sizeof(sup_window)))
     {
         if (!get_property(disp, DefaultRootWindow(disp),
-                                                  XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK",
-                                              (char *)sup_window, sizeof(sup_window)))
+                          XA_CARDINAL, "_WIN_SUPPORTING_WM_CHECK",
+                          (char *)sup_window, sizeof(sup_window)))
         {
             cout << "could not get window manager\n";
         }
@@ -67,12 +67,12 @@ string wm_info(Display *disp)
 
     /* WM_NAME */
     if (!get_property(disp, *sup_window,
-                                 XInternAtom(disp, "UTF8_STRING", False), "_NET_WM_NAME",
-                                 wm_name, sizeof(wm_name)))
+                      XInternAtom(disp, "UTF8_STRING", False), "_NET_WM_NAME",
+                      wm_name, sizeof(wm_name)))
     {
         if (!get_property(disp, *sup_window,
-                                     XA_STRING, "_NET_WM_NAME",
-                                 wm_name, sizeof(wm_name)))
+                          XA_STRING, "_NET_WM_NAME",
+                          wm_name, sizeof(wm_name)))
         {
             cout << "could not get window manager name\n";
         }
