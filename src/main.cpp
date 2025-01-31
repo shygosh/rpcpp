@@ -2,11 +2,12 @@
 
 /*
  * Change with your own app's id if you made one.
+ * default: 934099338374824007
  */
-#define APP_ID  (934099338374824007)
+#define APP_ID  (1334839099227635772)
 
-DistroAsset distroAsset = {"", ""};
-DistroAsset windowAsset = {"", ""};
+DistroAsset distroAsset = {"fedora", "Fedora Linux"};
+DistroAsset windowAsset = {"kwin", "KWin"};
 
 void *updateRPC(void *ptr)
 {
