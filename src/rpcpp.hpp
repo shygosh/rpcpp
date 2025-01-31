@@ -163,6 +163,8 @@ long getRAM(void)
             available = stoi(matcher[1]);
         if (regex_search(line, matcher, memtotalr))
             total = stoi(matcher[1]);
+        if (total && available)
+            break;
     }
     meminfo.close();
 
