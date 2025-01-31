@@ -57,25 +57,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    disp = XOpenDisplay(NULL);
-
-    if (!disp)
-    {
-        cout << "Can't open display" << endl;
-        return -1;
-    }
-
-    static int (*old_error_handler)(Display *, XErrorEvent *);
-    trapped_error_code = 0;
-    old_error_handler = XSetErrorHandler(error_handler);
-
-    pthread_t updateThread;
-    pthread_t usageThread;
-    pthread_create(&usageThread, 0, updateUsage, 0);
-    log("Created usage thread", LogType::DEBUG);
-
     DiscordState state{};
-
     discord::Core *core{};
     auto result = discord::Core::Create(APP_ID, DiscordCreateFlags_Default, &core);
     state.core.reset(core);
@@ -85,6 +67,26 @@ int main(int argc, char **argv)
              << ")\n";
         exit(-1);
     }
+    log("Connected to Discord.", LogType::INFO);
+
+    disp = XOpenDisplay(NULL);
+    if (!disp)
+    {
+        cout << "Can't open display" << endl;
+        return -1;
+    }
+    // this is kinda dumb to do since it shouldn't be anything else other than 11, but whatever
+    log("Xorg version " + to_string(XProtocolVersion(disp)), LogType::DEBUG);
+
+    static int (*old_error_handler)(Display *, XErrorEvent *);
+    trapped_error_code = 0;
+    old_error_handler = XSetErrorHandler(error_handler);
+
+    pthread_t updateThread, usageThread;
+    pthread_create(&usageThread, 0, updateUsage, 0);
+    log("Created usage thread", LogType::DEBUG);
+    pthread_create(&updateThread, 0, updateRPC, ((void *)&state));
+    log("Threads started.", LogType::DEBUG);
 
     if (config.debug)
     {
@@ -92,11 +94,6 @@ int main(int argc, char **argv)
             discord::LogLevel::Debug, [](discord::LogLevel level, const char *message)
             { cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n"; });
     }
-
-    pthread_create(&updateThread, 0, updateRPC, ((void *)&state));
-    log("Threads started.", LogType::DEBUG);
-    log("Xorg version " + to_string(XProtocolVersion(disp)), LogType::DEBUG); // this is kinda dumb to do since it shouldn't be anything else other than 11, but whatever
-    log("Connected to Discord.", LogType::INFO);
 
     signal(SIGINT, [](int) { interrupted = true; });
 
