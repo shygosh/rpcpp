@@ -58,12 +58,6 @@ struct DistroAsset
     string text;
 };
 
-struct WindowAsset
-{
-    string image;
-    string text;
-};
-
 struct Config
 {
     bool debug = false;

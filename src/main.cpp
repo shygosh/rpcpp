@@ -6,7 +6,7 @@
 #define APP_ID  (934099338374824007)
 
 DistroAsset distroAsset = {"", ""};
-WindowAsset windowAsset = {"", ""};
+DistroAsset windowAsset = {"", ""};
 
 void *updateRPC(void *ptr)
 {
