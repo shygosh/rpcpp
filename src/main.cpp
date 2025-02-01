@@ -11,9 +11,11 @@ WindowAsset windowAsset = {"", ""};
 void *updateRPC(void *ptr)
 {
     DiscordState *state = (struct DiscordState *)ptr;
-    log("Waiting for usages to load...", LogType::DEBUG);
-    while (cpu == -1 || mem == -1)
-        sleep(1);
+    startTime = time(0) - ms_uptime();
+    wm = string(wm_info(disp));
+
+    log("Distro: " + distroAsset.text, LogType::DEBUG);
+    log("WM: " + wm, LogType::DEBUG);
     log("Starting RPC loop.", LogType::DEBUG);
 
     while (true)
@@ -21,21 +23,6 @@ void *updateRPC(void *ptr)
         setActivity(*state, string("CPU: " + to_string(getCPU()) + "% | RAM: " + to_string(getRAM()) + "%"),
                     "WM: " + wm, windowAsset.image, windowAsset.text, distroAsset.image, distroAsset.text,
                     startTime, discord::ActivityType::Playing);
-        sleep(config.updateInterval);
-    }
-}
-
-void *updateUsage(void *ptr)
-{
-    startTime = time(0) - ms_uptime();
-    wm = string(wm_info(disp));
-    log("Distro: " + distroAsset.text, LogType::DEBUG);
-    log("WM: " + wm, LogType::DEBUG);
-
-    while (true)
-    {
-        mem = getRAM();
-        cpu = getCPU();
         sleep(config.updateInterval);
     }
 }
@@ -82,9 +69,7 @@ int main(int argc, char **argv)
     trapped_error_code = 0;
     old_error_handler = XSetErrorHandler(error_handler);
 
-    pthread_t updateThread, usageThread;
-    pthread_create(&usageThread, 0, updateUsage, 0);
-    log("Created usage thread", LogType::DEBUG);
+    pthread_t updateThread;
     pthread_create(&updateThread, 0, updateRPC, ((void *)&state));
     log("Threads started.", LogType::DEBUG);
 
@@ -106,7 +91,6 @@ int main(int argc, char **argv)
     cout << "Exiting..." << endl;
     XCloseDisplay(disp);
     pthread_kill(updateThread, 9);
-    pthread_kill(usageThread, 9);
 
     return 0;
 }
