@@ -165,6 +165,52 @@ long getRAM(void)
     return (total - available) * 100 / total;
 }
 
+unsigned long getNetRX(void)
+{
+    FILE *file = nullptr;
+    unsigned long RX = 0, total = 0;
+    file = fopen("/sys/class/net/eno1/statistics/rx_bytes", "r");
+    if (file)
+    {
+        fscanf(file, "%lu", &RX);
+        fclose(file);
+        file = nullptr;
+    }
+    total += RX;
+    file = fopen("/sys/class/net/wlo1/statistics/rx_bytes", "r");
+    if (file)
+    {
+        fscanf(file, "%lu", &RX);
+        fclose(file);
+        file = nullptr;
+    }
+    total += RX;
+    return total;
+}
+
+unsigned long getNetTX(void)
+{
+    FILE *file = nullptr;
+    unsigned long TX = 0, total = 0;
+    file = fopen("/sys/class/net/eno1/statistics/tx_bytes", "r");
+    if (file)
+    {
+        fscanf(file, "%lu", &TX);
+        fclose(file);
+        file = nullptr;
+    }
+    total += TX;
+    file = fopen("/sys/class/net/wlo1/statistics/tx_bytes", "r");
+    if (file)
+    {
+        fscanf(file, "%lu", &TX);
+        fclose(file);
+        file = nullptr;
+    }
+    total += TX;
+    return total;
+}
+
 void parseConfigOption(Config *config, char *option, bool arg)
 {
     smatch matcher;

@@ -20,7 +20,10 @@ void *updateRPC(void *ptr)
 
     while (true)
     {
-        setActivity(*state, string("CPU: " + to_string(getCPU()) + "% | RAM: " + to_string(getRAM()) + "%"),
+        setActivity(*state, string("CPU: " + to_string(getCPU()) + "% | " +
+                                   "RAM: " + to_string(getRAM()) + "% | " +
+                                   "D: " + to_string(getNetRX() >> 20) + "MB | "
+                                   "U: " + to_string(getNetTX() >> 20) + "MB"),
                     "WM: " + wm, windowAsset.image, windowAsset.text, distroAsset.image, distroAsset.text,
                     startTime, discord::ActivityType::Playing);
         sleep(config.updateInterval);
