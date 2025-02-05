@@ -119,29 +119,38 @@ long ms_uptime(void)
     return retval;
 }
 
-static unsigned long lastTotalUser = 0, lastTotalUserLow = 0,
-                     lastTotalSys = 0, lastTotalIdle = 0;
+static unsigned long long
+lastTotalUser = 0, lastTotalUserLow = 0, lastTotalSys = 0,
+lastTotalIdle = 0, lastPercent = 0;
 
-unsigned long getCPU(void)
+unsigned long long getCPU(void)
 {
-    unsigned long totalUser, totalUserLow, totalSys, totalIdle, percent, total;
+    unsigned long long totalUser, totalUserLow, totalSys, totalIdle, total, percent;
     FILE *file = fopen("/proc/stat", "r");
-    fscanf(file, "cpu %ld %ld %ld %ld", &totalUser, &totalUserLow, &totalSys, &totalIdle);
+    if (!file) return lastPercent;
+    if (fscanf(file, "cpu %llu %llu %llu %llu", &totalUser, &totalUserLow, &totalSys, &totalIdle) != 4) {
+        fclose(file);
+        return lastPercent;
+    }
     fclose(file);
 
     total = (totalUser - lastTotalUser) +
             (totalUserLow - lastTotalUserLow) +
-            (totalSys - lastTotalSys);
-    percent = total;
-    total += totalIdle - lastTotalIdle;
-    percent *= 100;
-    percent /= total;
+            (totalSys - lastTotalSys) +
+            (totalIdle - lastTotalIdle);
+
+    if (total == 0) return 0;
+
+    percent = ((totalUser - lastTotalUser) +
+               (totalUserLow - lastTotalUserLow) +
+               (totalSys - lastTotalSys)) * 100 / total;
+
     lastTotalUser = totalUser;
     lastTotalUserLow = totalUserLow;
     lastTotalSys = totalSys;
     lastTotalIdle = totalIdle;
 
-    return percent;
+    return lastPercent = percent;
 }
 
 long getRAM(void)
