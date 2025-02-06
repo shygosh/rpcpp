@@ -47,6 +47,18 @@ int main(int argc, char **argv)
         exit(0);
     }
 
+    const char* isRunning = "pidof -s Discord > /dev/null";
+    while (system(isRunning))
+    {
+        log("Waiting for Discord to run.", LogType::INFO);
+        sleep(60);
+    }
+    /*
+     * Corner-case issue:
+     * Once its running, wait for a few seconds for it to fully loaded.
+     */
+    sleep(7);
+
     DiscordState state{};
     discord::Core *core{};
     auto result = discord::Core::Create(APP_ID, DiscordCreateFlags_Default, &core);
