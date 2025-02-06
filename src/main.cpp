@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     do
     {
         state.core->RunCallbacks();
-        this_thread::sleep_for(chrono::milliseconds(16));
+        this_thread::sleep_for(chrono::seconds(1));
     } while (!should_exit);
 
     cout << "Exiting..." << endl;
