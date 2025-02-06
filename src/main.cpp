@@ -95,13 +95,15 @@ int main(int argc, char **argv)
             { cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n"; });
     }
 
-    signal(SIGINT, [](int) { interrupted = true; });
+    signal(SIGINT, [](int) { should_exit = true; });
+    signal(SIGPIPE, [](int) { should_exit = true; });
+    signal(SIGTERM, [](int) { should_exit = true; });
 
     do
     {
         state.core->RunCallbacks();
         this_thread::sleep_for(chrono::milliseconds(16));
-    } while (!interrupted);
+    } while (!should_exit);
 
     cout << "Exiting..." << endl;
     XCloseDisplay(disp);

@@ -21,7 +21,7 @@
 
 namespace
 {
-    volatile bool interrupted{false};
+    volatile bool should_exit{false};
 }
 namespace fs = std::filesystem;
 using namespace std;
